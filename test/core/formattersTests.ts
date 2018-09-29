@@ -100,6 +100,11 @@ describe("Formatters", () => {
   });
 
   describe("exponential()", () => {
+    it("works for zero", () => {
+      const exponential = Plottable.Formatters.exponential(2);
+      assert.strictEqual(exponential(0), "0", "returns 0 for 0");
+    });
+
     it("shows correct amount of digits according to precision", () => {
       const exponential3 = Plottable.Formatters.exponential();
       assert.strictEqual(exponential3(1), "1", "does not pad 0 to three decimal places");
@@ -135,8 +140,7 @@ describe("Formatters", () => {
 
     it("stringifies non-numeric values", () => {
       const exponential = Plottable.Formatters.exponential();
-      const nonNumericValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"];
-      const stringifiedValues = ["null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc"];
+      const nonNumericValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"]; const stringifiedValues = ["null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc"];
       nonNumericValues.forEach((value, i) =>
         assert.strictEqual(exponential(value), stringifiedValues[i], `non-numeric input ${value} is stringified`),
       );

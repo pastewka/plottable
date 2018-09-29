@@ -132,7 +132,7 @@ function unicode_superscript(s: string) {
 export function exponential(maxNumberOfDecimalPlaces = 3) {
   verifyPrecision(maxNumberOfDecimalPlaces);
   return (d: any) => {
-    if (d === undefined || isNaN(d) || Math.abs(d) == Infinity) {
+    if (d == 0 || d === undefined || isNaN(d) || Math.abs(d) == Infinity) {
       return String(d);
     } else if (typeof d === "number") {
       const multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
