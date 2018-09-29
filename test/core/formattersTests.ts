@@ -99,6 +99,64 @@ describe("Formatters", () => {
     });
   });
 
+  describe("exponential()", () => {
+    it("shows correct amount of digits according to precision", () => {
+      const exponential3 = Plottable.Formatters.exponential();
+      assert.strictEqual(exponential3(1), "1", "does not pad 0 to three decimal places");
+      assert.strictEqual(exponential3(-1), "-1", "does not pad 0 to three decimal places");
+      assert.strictEqual(exponential3(1.234), "1.234", "shows up to three decimal places");
+      assert.strictEqual(exponential3(-1.234), "-1.234", "shows up to three decimal places");
+      assert.strictEqual(exponential3(1.2346), "1.235", "shows up to three decimal places");
+      assert.strictEqual(exponential3(-1.2346), "-1.235", "shows up to three decimal places");
+
+      const exponential2 = Plottable.Formatters.exponential(2);
+      assert.strictEqual(exponential2(1), "1", "does not pad 0 to two decimal places");
+      assert.strictEqual(exponential2(-1), "-1", "does not pad 0 to two decimal places");
+      assert.strictEqual(exponential2(1.2), "1.2", "does not pad 0 to two decimal places");
+      assert.strictEqual(exponential2(-1.2), "-1.2", "does not pad 0 to two decimal places");
+      assert.strictEqual(exponential2(1.23), "1.23", "shows up to two decimal places");
+      assert.strictEqual(exponential2(-1.23), "-1.23", "shows up to two decimal places");
+      assert.strictEqual(exponential2(1.235), "1.24", "shows up to two decimal places");
+      assert.strictEqual(exponential2(-1.235), "-1.24", "shows up to two decimal places");
+
+      const exponential0 = Plottable.Formatters.exponential(0);
+      assert.strictEqual(exponential0(1), "1", "shows no decimals");
+      assert.strictEqual(exponential0(1.535), "2", "shows no decimals");
+    });
+
+    it("stringifies to unicode exponentials", () => {
+      const exponential = Plottable.Formatters.exponential(2);
+      assert.strictEqual(exponential(0.012324), "1.23×10⁻²");
+      assert.strictEqual(exponential(0.12324), "1.23×10⁻¹");
+      assert.strictEqual(exponential(1.2324), "1.23");
+      assert.strictEqual(exponential(12.324), "1.23×10¹");
+      assert.strictEqual(exponential(123.24), "1.23×10²");
+    });
+
+    it("stringifies non-numeric values", () => {
+      const exponential = Plottable.Formatters.exponential();
+      const nonNumericValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"];
+      const stringifiedValues = ["null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc"];
+      nonNumericValues.forEach((value, i) =>
+        assert.strictEqual(exponential(value), stringifiedValues[i], `non-numeric input ${value} is stringified`),
+      );
+    });
+
+    it("throws an error on invalid precision", () => {
+      const nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      nonIntegerValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.exponential(<any> value), Error,
+          "Formatter precision must be an integer", `${value} is not a valid precision value`),
+      );
+
+      const outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      outOfBoundValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.exponential(<any> value), Error,
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`),
+      );
+    });
+  });
+
   describe("identity()", () => {
     it("stringifies inputs", () => {
       const identity = Plottable.Formatters.identity();

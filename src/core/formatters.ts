@@ -94,6 +94,64 @@ export function general(maxNumberOfDecimalPlaces = 3) {
 }
 
 /**
+ * Convert numerals inside a string into the unicode superscript equivalent, e.g.
+ *   µm3 => µm³
+ *
+ * @param {string} [s] The input string.
+ *
+ * @returns {string} The output string.
+ */
+function unicode_superscript(s: string) {
+  const superscript_dict:any = {
+    0: "⁰",
+    1: "¹",
+    2: "²",
+    3: "³",
+    4: "⁴",
+    5: "⁵",
+    6: "⁶",
+    7: "⁷",
+    8: "⁸",
+    9: "⁹",
+    "+": "⁺",
+    "-": "⁻",
+    ".": "⋅",
+  };
+  return s.split("").map((c: string) => c in superscript_dict ? superscript_dict[c] : c).join("");
+}
+
+/**
+ * Creates a formatter that formats numbers to show no more than
+ * [maxNumberOfDecimalPlaces] decimal places in exponential notation.
+ * Exponentials will be displayed human readably, i.e. 1.3×10³.
+ *
+ * @param {number} [maxNumberOfDecimalPlaces] The number of decimal places to show (default 3).
+ *
+ * @returns {Formatter} A formatter for general values.
+ */
+export function exponential(maxNumberOfDecimalPlaces = 3) {
+  verifyPrecision(maxNumberOfDecimalPlaces);
+  return (d: any) => {
+    if (d === undefined || isNaN(d) || Math.abs(d) == Infinity) {
+      return String(d);
+    } else if (typeof d === "number") {
+      const multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
+      const sign = d < 0 ? - 1 : 1;
+      const e = Math.floor(Math.log(sign * d)/Math.log(10));
+      const m = sign * d / 10 ** e;
+      const m_rounded = Math.round(m * multiplier) / multiplier;
+      if (e == 0) {
+        return String(sign * m_rounded); // do not attach ×10⁰ == 1
+      } else {
+        return String(sign * m_rounded) + "×10" + unicode_superscript(String(e));
+      }
+    } else {
+      return String(d);
+    }
+  };
+}
+
+/**
  * Creates a formatter that stringifies its input.
  *
  * @returns {Formatter} A formatter that stringifies its input.
