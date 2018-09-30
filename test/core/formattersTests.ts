@@ -100,9 +100,11 @@ describe("Formatters", () => {
   });
 
   describe("exponential()", () => {
-    it("works for zero", () => {
+    it("special cases", () => {
       const exponential = Plottable.Formatters.exponential(2);
       assert.strictEqual(exponential(0), "0", "returns 0 for 0");
+      assert.strictEqual(exponential(100), "10²", "omits prefactor if equal to 1");
+      assert.strictEqual(exponential(0.01), "10⁻²", "omits prefactor if equal to 1");
     });
 
     it("shows correct amount of digits according to precision", () => {
