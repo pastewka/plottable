@@ -137,9 +137,13 @@ export function exponential(maxNumberOfDecimalPlaces = 3) {
     } else if (typeof d === "number") {
       const multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
       const sign = d < 0 ? - 1 : 1;
-      const e = Math.floor(Math.log(sign * d)/Math.log(10));
+      var e = Math.floor(Math.log(sign * d)/Math.log(10));
       const m = sign * d / 10 ** e;
-      const m_rounded = Math.round(m * multiplier) / multiplier;
+      var m_rounded = Math.round(m * multiplier) / multiplier;
+      if (m_rounded == 10) {
+        m_rounded = 1;
+        e++;
+      }
       if (e == 0) {
         return String(sign * m_rounded); // do not attach ×10⁰ == 1
       } else if (m_rounded == 1) {
