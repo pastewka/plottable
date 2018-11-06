@@ -8,15 +8,20 @@ import * as d3 from "d3";
 import { QuantitativeScale } from "./quantitativeScale";
 
 export class Log extends QuantitativeScale<number> {
+  private _base: number;
+  private _minimumNumberOfTicks: number;
   private _d3Scale: d3.ScaleLogarithmic<number, number>;
 
   /**
    * @constructor
    */
-  constructor(base = 10) {
+  constructor(base = 10, minimumNumberOfTicks = 4) {
     super();
+    this._base = base;
+    this._minimumNumberOfTicks = minimumNumberOfTicks;
     this._d3Scale = d3.scaleLog().base(base);
     this._setDomain(this._defaultExtent());
+    this.tickGenerator(this._logTickGenerator);
   }
 
   protected _defaultExtent(): number[] {
@@ -80,6 +85,31 @@ export class Log extends QuantitativeScale<number> {
 
   public invert(value: number) {
     return this._d3Scale.invert(value);
+  }
+
+  private _logTickGenerator = (scale: QuantitativeScale<number>) => {
+    const domain = this._getDomain()
+    const min = domain[0];
+    const max = domain[1];
+    const j = Math.ceil(Math.log(max) / Math.log(this._base));
+    var i = Math.floor(Math.log(min) / Math.log(this._base));
+    var ticks = [];
+    if (i < j) {
+      for (; i < j; ++i) {
+        ticks.push(Math.pow(this._base, i));
+      }
+    }
+    else {
+      for (; i > j; --i) {
+        ticks.push(Math.pow(this._base, i));
+      }
+    }
+    if (ticks.length < this._minimumNumberOfTicks) {
+      return this._d3Scale.ticks(this._minimumNumberOfTicks);
+    }
+    else {
+      return ticks;
+    }
   }
 
   public defaultTicks(): number[] {
