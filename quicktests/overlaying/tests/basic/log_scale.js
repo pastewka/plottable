@@ -22,7 +22,7 @@ function run(div, data, Plottable) {
     var yAxis = new Plottable.Axes.Numeric(yScale, "left")
         .formatter(Plottable.Formatters.exponential());
 
-    var plot = new Plottable.Plots.Scatter()
+    var plot1 = new Plottable.Plots.Scatter()
         .renderer("svg")
         .deferredRendering(true)
         .addDataset(new Plottable.Dataset(data))
@@ -30,12 +30,22 @@ function run(div, data, Plottable) {
         .x((d) => d.x, xScale)
         .y((d) => d.y, yScale);
 
+    var plot2 = new Plottable.Plots.Scatter()
+        .renderer("svg")
+        .deferredRendering(true)
+        .addDataset(new Plottable.Dataset(data))
+        .labelsEnabled(true)
+        .x((d) => 10000*d.x, xScale)
+        .y((d) => 1000*d.y, yScale);
+
+    var plotGroup = new Plottable.Components.Group([plot1, plot2]);
+
     var table = new Plottable.Components.Table([
-        [yAxis, plot],
+        [yAxis, plotGroup],
         [null, xAxis]
     ]);
 
-    var panZoom = new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(plot);
+    var panZoom = new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(plotGroup);
 
     table.renderTo(div);
 
